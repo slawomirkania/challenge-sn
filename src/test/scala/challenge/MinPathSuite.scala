@@ -14,18 +14,19 @@ class MinPathSuite extends FunSuite {
         |11 2 10 9
         |""".stripMargin
 
-    assertEquals(MinPath.minPath(input), 18)
+    assertEquals(MinPath.minPath(input).map(_._1), Some(18))
+    assertEquals(MinPath.minPath(input).map(_._2), Some(Vector(7, 6, 3, 2)))
   }
 
   test("data_small.txt") {
     val input = Source.fromResource("data_small.txt").getLines.mkString("\n")
 
-    assertEquals(MinPath.minPath(input), 50)
+    assertEquals(MinPath.minPath(input).map(_._1), Some(50))
   }
 
   test("data_big.txt") {
     val input = Source.fromResource("data_big.txt").getLines.mkString("\n")
 
-    assertEquals(MinPath.minPath(input), 2000)
+    assertEquals(MinPath.minPath(input).map(_._1), Some(2000))
   }
 }

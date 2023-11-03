@@ -29,3 +29,4 @@ I assume that input is correct and non-empty, so I skip validation
 - List instead of Vector took 17 seconds to complete
 - Vector reverse with using head instead of tail reduced execution time to 800ms
 - some refactoring took another 100ms acceleration
+- I may lose few milliseconds here ```.groupBy(_._1).minBy(_._1)._2.head``` but I wanted to complete the task fully

@@ -4,57 +4,61 @@ package challenge
 import scala.annotation.tailrec
 
 object MinPath {
-  def minPath(input: String): Int = {
+  def minPath(input: String): Option[(Int, Vector[Int])] = {
     val triangle       = stringAsVector(input)
     val triangleLevels = triangle.length
 
     (triangle match {
       case head +: tail =>
-        head.zipWithIndex.foldLeft(Vector.empty[Int]) { case (acc, (digit, index)) =>
+        head.zipWithIndex.foldLeft(Vector.empty[(Int, Vector[Int])]) { case (acc, (digit, index)) =>
           val leftIndex  = index - 1
           val rightIndex = index
           val startLevel = ActualLevel(1)
 
-          def calculate = calculateTail(digit, _: Index, startLevel, tail, Levels(triangleLevels)).toVector
+          def calculate =
+            calculateTail((digit, Vector(digit)), _: Index, startLevel, tail, Levels(triangleLevels)).toVector
 
-          val left  = if (leftIndex >= 0) calculate(Index(leftIndex)) else Vector.empty[Int]
-          val right = calculate(Index(rightIndex))
+          val left: Vector[(Int, Vector[Int])] =
+            if (leftIndex >= 0) calculate(Index(leftIndex)) else Vector.empty[(Int, Vector[Int])]
+          val right: Vector[(Int, Vector[Int])] = calculate(Index(rightIndex))
 
           acc ++ left ++ right
         }
-      case IndexedSeq() => Vector.empty[Int]
-    }).min
+      case IndexedSeq() => Vector.empty[(Int, Vector[Int])]
+    }).groupBy(_._1).minBy(_._1)._2.headOption
   }
 
   @tailrec
   private def calculateTail(
-      acc: Int,
+      acc: (Int, Vector[Int]),
       index: Index,
       actualLevel: ActualLevel,
       levelsTail: Vector[Vector[Int]],
       levels: Levels
-  ): Option[Int] = {
-    lazy val result: Option[Int] = Option.when(actualLevel.value == levels.value)(acc)
+  ): Option[(Int, Vector[Int])] = {
+    lazy val result: Option[(Int, Vector[Int])] = Option.when(actualLevel.value == levels.value)(acc)
 
     levelsTail match {
       case head +: tail =>
-        if (index.value > 0 && index.value < head.length)
+        if (index.value > 0 && index.value < head.length) {
+          val digit = head(index.value)
           calculateTail(
-            acc + head(index.value),
+            (acc._1 + digit, digit +: acc._2),
             index.decrement,
             actualLevel.increment,
             tail,
             levels
           )
-        else if (index.value == 0)
+        } else if (index.value == 0) {
+          val digit = head(index.value)
           calculateTail(
-            acc + head(index.value),
+            (acc._1 + digit, digit +: acc._2),
             index,
             actualLevel.increment,
             tail,
             levels
           )
-        else result
+        } else result
       case IndexedSeq() => result
     }
   }

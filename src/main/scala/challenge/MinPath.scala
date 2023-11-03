@@ -41,12 +41,12 @@ object MinPath {
     result.min
   }
 
-  case class ActualLevel(value: Int) extends AnyVal {
+  final case class ActualLevel(value: Int) extends AnyVal {
     def increment: ActualLevel = ActualLevel(value + 1)
   }
 
-  case class Index(value: Int)  extends AnyVal
-  case class Levels(value: Int) extends AnyVal
+  final case class Index(value: Int)  extends AnyVal
+  final case class Levels(value: Int) extends AnyVal
 
   @tailrec
   private def calculateTail(

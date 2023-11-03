@@ -5,42 +5,85 @@ import scala.annotation.tailrec
 
 object MinPath {
   def minPath(input: String): Int = {
-    val triangle = input.split("\n").toVector.map(_.split(" ").toVector.map(_.toInt))
-    val levels   = triangle.length
+    val triangle       = stringAsVector(input)
+    val triangleLevels = triangle.length
+    val triangleTail   = triangle.dropRight(1)
 
-    @tailrec
-    def calcTail(acc: Int, level: Int, index: Int, tail: Vector[Vector[Int]]): Option[Int] =
-      tail match {
-        case Nil =>
-          if (level == levels) Some(acc)
-          else None
-        case _ =>
-          val last = tail.takeRight(1).last
-          if (index > 0 && index < last.length)
-            calcTail(acc + last(index), level + 1, index - 1, tail.dropRight(1))
-          else if (index == 0) calcTail(acc + last(index), level + 1, index, tail.dropRight(1))
-          else if (level == levels) Some(acc)
-          else None
-      }
+    val result = triangle.last.zipWithIndex
+      .foldLeft(Vector.empty[Int]) { case (acc, (digit, digitIndex)) =>
+        val leftParentIndex  = digitIndex - 1
+        val rightParentIndex = digitIndex
 
-    val tail = triangle.dropRight(1)
-    val result = triangle
-      .takeRight(1)
-      .last
-      .zipWithIndex
-      .foldLeft(List.empty[Int]) { case (acc, (elem, index)) =>
-        val leftParentIndex  = index - 1
-        val rightParentIndex = index
+        val startLevel = 1
 
-        val left = if (leftParentIndex >= 0) {
-          calcTail(elem, 1, leftParentIndex, tail).toList
-        } else List.empty[Int]
+        val left =
+          if (leftParentIndex >= 0)
+            calculateTail(
+              digit,
+              Index(leftParentIndex),
+              ActualLevel(startLevel),
+              triangleTail,
+              Levels(triangleLevels)
+            ).toVector
+          else Vector.empty[Int]
 
-        val right = calcTail(elem, 1, rightParentIndex, tail).toList
+        val right = calculateTail(
+          digit,
+          Index(rightParentIndex),
+          ActualLevel(startLevel),
+          triangleTail,
+          Levels(triangleLevels)
+        ).toVector
 
-        acc.appendedAll(left ::: right)
+        acc ++ left ++ right
       }
 
     result.min
   }
+
+  case class ActualLevel(value: Int) extends AnyVal {
+    def increment: ActualLevel = ActualLevel(value + 1)
+  }
+
+  case class Index(value: Int)  extends AnyVal
+  case class Levels(value: Int) extends AnyVal
+
+  @tailrec
+  private def calculateTail(
+      acc: Int,
+      index: Index,
+      actualLevel: ActualLevel,
+      tail: Vector[Vector[Int]],
+      levels: Levels
+  ): Option[Int] = {
+    lazy val result: Option[Int] =
+      if (actualLevel.value == levels.value) Some(acc)
+      else None
+
+    if (tail.nonEmpty) {
+      lazy val nextLevel = tail.takeRight(1).head
+      lazy val tailLeft  = tail.dropRight(1)
+
+      if (index.value > 0 && index.value < nextLevel.length)
+        calculateTail(
+          acc + nextLevel(index.value),
+          Index(index.value - 1),
+          actualLevel.increment,
+          tailLeft,
+          levels
+        )
+      else if (index.value == 0)
+        calculateTail(
+          acc + nextLevel(index.value),
+          index,
+          actualLevel.increment,
+          tailLeft,
+          levels
+        )
+      else result
+    } else result
+  }
+
+  private def stringAsVector(input: String): Vector[Vector[Int]] =
+    input.split("\n").toVector.map(_.split(" ").toVector.map(_.toInt))
 }

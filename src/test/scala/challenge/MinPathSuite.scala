@@ -4,7 +4,14 @@ package challenge
 import munit.FunSuite
 
 class MinPathSuite extends FunSuite {
-  test("Min path") {
-    assertEquals(MinPath.minPath(Vector(Vector(7), Vector(6, 3), Vector(3, 8, 5), Vector(11, 2, 10, 9))), 18)
+  test("Min path basic example") {
+    val input =
+      """7
+        |6 3
+        |3 8 5
+        |11 2 10 9
+        |""".stripMargin
+
+    assertEquals(MinPath.minPath(input), 18)
   }
 }

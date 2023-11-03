@@ -4,8 +4,9 @@ package challenge
 import scala.annotation.tailrec
 
 object MinPath {
-  def minPath(triangle: Vector[Vector[Int]]): Int = {
-    val levels = triangle.length
+  def minPath(input: String): Int = {
+    val triangle = input.split("\n").toVector.map(_.split(" ").toVector.map(_.toInt))
+    val levels   = triangle.length
 
     @tailrec
     def calcTail(acc: Int, level: Int, index: Int, tail: Vector[Vector[Int]]): Option[Int] =

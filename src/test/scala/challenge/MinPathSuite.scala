@@ -22,4 +22,10 @@ class MinPathSuite extends FunSuite {
 
     assertEquals(MinPath.minPath(input), 50)
   }
+
+  test("data_big.txt") {
+    val input = Source.fromResource("data_big.txt").getLines.mkString("\n")
+
+    assertEquals(MinPath.minPath(input), 2000)
+  }
 }

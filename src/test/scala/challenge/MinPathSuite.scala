@@ -3,6 +3,8 @@ package challenge
 
 import munit.FunSuite
 
+import scala.io.Source
+
 class MinPathSuite extends FunSuite {
   test("Min path basic example") {
     val input =
@@ -13,5 +15,11 @@ class MinPathSuite extends FunSuite {
         |""".stripMargin
 
     assertEquals(MinPath.minPath(input), 18)
+  }
+
+  test("data_small.txt") {
+    val input = Source.fromResource("data_small.txt").getLines.mkString("\n")
+
+    assertEquals(MinPath.minPath(input), 50)
   }
 }

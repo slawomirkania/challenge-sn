@@ -14,8 +14,10 @@ class MinPathSuite extends FunSuite {
         |11 2 10 9
         |""".stripMargin
 
-    assertEquals(MinPath.minPath(input).map(_._1), Some(18))
-    assertEquals(MinPath.minPath(input).map(_._2), Some(Vector(7, 6, 3, 2)))
+    val result = MinPath.minPath(input)
+
+    assertEquals(result.map(_._1), Some(18))
+    assertEquals(result.map(_._2), Some(Vector(7, 6, 3, 2)))
   }
 
   test("data_small.txt") {

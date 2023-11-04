@@ -5,26 +5,26 @@ import scala.annotation.tailrec
 
 object MinPath {
   def minPath(input: String): Option[(Int, Vector[Int])] = {
-    val triangle       = stringAsVector(input)
-    val triangleLevels = triangle.length
+    val triangle        = stringAsVector(input)
+    val allLevelsAmount = Levels(triangle.length)
+    val startingLevel   = ActualLevel(1)
 
     (triangle match {
       case head +: tail =>
         head.zipWithIndex.foldLeft(Vector.empty[(Int, Vector[Int])]) { case (acc, (digit, index)) =>
-          val leftIndex  = index - 1
-          val rightIndex = index
-          val startLevel = ActualLevel(1)
+          val leftIndex  = Index(index - 1)
+          val rightIndex = Index(index)
 
-          def calculate =
-            calculateTail((digit, Vector(digit)), _: Index, startLevel, tail, Levels(triangleLevels)).toVector
+          val calculateF =
+            calculateTail((digit, Vector(digit)), _: Index, startingLevel, tail, allLevelsAmount).toVector
 
           val left: Vector[(Int, Vector[Int])] =
-            if (leftIndex >= 0) calculate(Index(leftIndex)) else Vector.empty[(Int, Vector[Int])]
-          val right: Vector[(Int, Vector[Int])] = calculate(Index(rightIndex))
+            if (leftIndex.value >= 0) calculateF(leftIndex) else Vector.empty[(Int, Vector[Int])]
+          val right: Vector[(Int, Vector[Int])] = calculateF(rightIndex)
 
           acc ++ left ++ right
         }
-      case IndexedSeq() => Vector.empty[(Int, Vector[Int])]
+      case _ => Vector.empty[(Int, Vector[Int])]
     }).groupBy(_._1).minBy(_._1)._2.headOption
   }
 
@@ -34,32 +34,33 @@ object MinPath {
       index: Index,
       actualLevel: ActualLevel,
       levelsTail: Vector[Vector[Int]],
-      levels: Levels
+      allLevelsAmount: Levels
   ): Option[(Int, Vector[Int])] = {
-    lazy val result: Option[(Int, Vector[Int])] = Option.when(actualLevel.value == levels.value)(acc)
+    lazy val result: Option[(Int, Vector[Int])] = Option.when(actualLevel.value == allLevelsAmount.value)(acc)
+    val (accSum, accAddends)                    = acc
 
     levelsTail match {
       case head +: tail =>
         if (index.value > 0 && index.value < head.length) {
           val digit = head(index.value)
           calculateTail(
-            (acc._1 + digit, digit +: acc._2),
+            (accSum + digit, digit +: accAddends),
             index.decrement,
             actualLevel.increment,
             tail,
-            levels
+            allLevelsAmount
           )
         } else if (index.value == 0) {
           val digit = head(index.value)
           calculateTail(
-            (acc._1 + digit, digit +: acc._2),
+            (accSum + digit, digit +: accAddends),
             index,
             actualLevel.increment,
             tail,
-            levels
+            allLevelsAmount
           )
         } else result
-      case IndexedSeq() => result
+      case _ => result
     }
   }
 

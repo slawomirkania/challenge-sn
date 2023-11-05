@@ -2,10 +2,13 @@ package com.example
 package challenge
 
 import scala.annotation.tailrec
+import scala.util.Try
 
 object MinPath {
-  def minPath(input: String): Option[(Int, Vector[Int])] = {
-    val triangle        = stringAsVector(input)
+  def minPath(input: String): Option[(Int, Vector[Int])] =
+    stringAsVector(input).flatMap(findMinPath)
+
+  private def findMinPath(triangle: Vector[Vector[Int]]): Option[(Int, Vector[Int])] = {
     val allLevelsAmount = Levels(triangle.length)
     val startingLevel   = ActualLevel(1)
 
@@ -64,8 +67,8 @@ object MinPath {
     }
   }
 
-  private def stringAsVector(input: String): Vector[Vector[Int]] =
-    input.split("\n").toVector.map(_.split(" ").toVector.map(_.toInt)).reverse
+  private def stringAsVector(input: String): Option[Vector[Vector[Int]]] =
+    Try(input.split("\n").toVector.map(_.split(" ").toVector.map(_.toInt)).reverse).toOption
 
   final case class ActualLevel(value: Int) extends AnyVal {
     def increment: ActualLevel = ActualLevel(value + 1)

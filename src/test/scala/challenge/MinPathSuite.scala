@@ -31,4 +31,8 @@ class MinPathSuite extends FunSuite {
 
     assertEquals(MinPath.minPath(input).map(_._1), Some(2000))
   }
+
+  test("empty") {
+    assertEquals(MinPath.minPath(""), None)
+  }
 }

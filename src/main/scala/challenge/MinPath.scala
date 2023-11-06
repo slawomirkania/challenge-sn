@@ -28,7 +28,7 @@ object MinPath {
           acc ++ left ++ right
         }
       case _ => Vector.empty[(Int, Vector[Int])]
-    }).groupBy(_._1).minBy(_._1)._2.headOption
+    }).minByOption(_._1)
   }
 
   @tailrec
